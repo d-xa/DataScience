@@ -29,12 +29,7 @@ class Matrix2D[N: Numeric](val data: Seq[Vector[N]], val rows: Int, val cols: In
   }
 
   def transpose: Matrix2D[N] = {
-    val flatdata = this.data.flatten.toVector
-    val newRows = this.cols //4
-    val newCols = this.rows //3
-    val flattransposedIdx = for (i <- 0 until this.cols; y <- 0 until this.rows) yield (i+(this.rows+1)*y)
-    val flattransposedData = flattransposedIdx.map( idx => flatdata(idx))
-    val transposed = flattransposedData.toVector.sliding(this.rows,this.rows).toList
+     val transposed = for(c <- 0 to this.cols-1) yield(this.data.map(v => v(c)).toVector)
     new Matrix2D(transposed)
   }
 
@@ -61,4 +56,22 @@ class Matrix2D[N: Numeric](val data: Seq[Vector[N]], val rows: Int, val cols: In
     val n = zipped.map{ t => minusVecElems(t._1, t._2) }
     new Matrix2D(n)
   }
+
+  // define matrix multiplication operator
+  def * (that: Matrix2D[N]): Matrix2D[N] = {
+    require(this.cols == that.rows)
+
+    val zipped: Seq[(Vector[N], Vector[N])] = for(t1 <- this.data; t2 <- that.transpose.data) yield (t1,t2)
+    val n: Seq[N] = zipped.map{ t => t._1.sum + t._2.sum }
+    val m: Seq[Vector[N]] = n.sliding(this.rows,this.rows).toList.map(_.toVector)
+
+    new Matrix2D(m)
+  }
+
+}
+
+// companion object
+object Matrix2D{
+  // factory method: apply
+  def apply[N: Numeric](data: Seq[Vector[N]]) = new Matrix2D[N](data)
 }
