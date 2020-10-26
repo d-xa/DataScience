@@ -39,6 +39,10 @@ object Main {
     val m5 = m1 * m4
     m5.show
 
+    println(m5.getCol(0))
+    println(m5.getCol(1))
+    println(m5.getCol(2))
+
   }
 
 }
